@@ -13,6 +13,15 @@
 @implementation ELCAlbumPickerController
 
 @synthesize parent, assetGroups;
+@synthesize assetsFilter = assetsFilter_;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+    self.assetsFilter = [ALAssetsFilter allAssets];
+  }
+  return self;
+}
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -112,7 +121,7 @@
     
     // Get count
     ALAssetsGroup *g = (ALAssetsGroup*)[assetGroups objectAtIndex:indexPath.row];
-    [g setAssetsFilter:[ALAssetsFilter allAssets]];
+    [g setAssetsFilter:self.assetsFilter];
     NSInteger gCount = [g numberOfAssets];
     
     cell.textLabel.text = [NSString stringWithFormat:@"%@ (%d)",[g valueForProperty:ALAssetsGroupPropertyName], gCount];
@@ -132,7 +141,7 @@
 
     // Move me    
     picker.assetGroup = [assetGroups objectAtIndex:indexPath.row];
-    [picker.assetGroup setAssetsFilter:[ALAssetsFilter allAssets]];
+    [picker.assetGroup setAssetsFilter:self.assetsFilter];
     
 	[self.navigationController pushViewController:picker animated:YES];
 	[picker release];
@@ -159,10 +168,11 @@
 }
 
 
-- (void)dealloc 
-{	
+- (void)dealloc  {
 	[assetGroups release];
-    [super dealloc];
+  self.assetsFilter = nil;
+  
+  [super dealloc];
 }
 
 @end
