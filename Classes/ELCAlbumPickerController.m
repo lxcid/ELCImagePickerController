@@ -5,7 +5,6 @@
 //  Copyright 2011 ELC Technologies. All rights reserved.
 //
 
-#import <AssetsLibrary/AssetsLibrary.h>
 #import "ELCAlbumPickerController.h"
 #import "ELCImagePickerController.h"
 #import "ELCAssetTablePicker.h"
@@ -38,6 +37,8 @@
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
 	self.assetGroups = tempArray;
     [tempArray release];
+    
+    library = [[ALAssetsLibrary alloc] init];      
 
     // Load Albums into assetGroups
     dispatch_async(dispatch_get_main_queue(), ^
@@ -54,9 +55,6 @@
             
             [self.assetGroups addObject:group];
 
-            // Keep this line!  w/o it the asset count is broken for some reason.  Makes no sense
-            NSLog(@"count: %d", [group numberOfAssets]);
-
             // Reload albums
             [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:YES];
         };
@@ -64,7 +62,7 @@
         // Group Enumerator Failure Block
         void (^assetGroupEnumberatorFailure)(NSError *) = ^(NSError *error) {
             
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Album Error: %@", [error description]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Album Error: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert show];
             [alert release];
             
@@ -72,13 +70,10 @@
         };	
                 
         // Enumerate Albums
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];        
         [library enumerateGroupsWithTypes:ALAssetsGroupAll
                                usingBlock:assetGroupEnumerator 
                              failureBlock:assetGroupEnumberatorFailure];
         
-        
-        [library release];
         [pool release];
     });    
 }
@@ -168,11 +163,12 @@
 }
 
 
-- (void)dealloc  {
-	[assetGroups release];
+- (void)dealloc 
+{	
+    [assetGroups release];
+    [library release];
   self.assetsFilter = nil;
-  
-  [super dealloc];
+    [super dealloc];
 }
 
 @end

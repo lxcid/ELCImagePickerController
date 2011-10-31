@@ -6,14 +6,14 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@class ALAssetsFilter;
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface ELCAlbumPickerController : UITableViewController {
 	
 	NSMutableArray *assetGroups;
 	NSOperationQueue *queue;
 	id parent;
+    ALAssetsLibrary *library;
   ALAssetsFilter *assetsFilter_;
 }
 
